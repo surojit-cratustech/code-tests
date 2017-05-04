@@ -40,6 +40,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private Texture dynaText;
     private BitmapFont aFont;
     private FrameBuffer lFb;
+    private Model cylModel;
+    private ModelInstance cylInst;
 
     @Override
 	public void create () {
@@ -84,34 +86,43 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 		ModelBuilder mb = new ModelBuilder();
-
-        Material lMaterial = new Material(TextureAttribute.createDiffuse(lFb.getColorBufferTexture()));
+        Texture lTexture = lFb.getColorBufferTexture();
+        lTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        Material lMaterial = new Material(TextureAttribute.createDiffuse(lTexture));
 
 		ballModel = mb.createSphere(1.0f,1.0f,1.0f,16,16,lMaterial, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 
+        cylModel = mb.createCapsule(1.0f,5.0f,16,lMaterial, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
+
+        cylInst = new ModelInstance(cylModel);
         ballInstance = new ModelInstance(ballModel);
 
-        ballInstance.transform.translate(0,0,-1.5f);
+        ballInstance.transform.translate(-0.5f,0,-1.5f);
+        cylInst.transform.rotate(0,0,1.0f,-90f);
+        cylInst.transform.translate(2f,0,-4.5f);
 	}
 
 
 	@Override
 	public void render () {
 
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+//		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        batch.setProjectionMatrix(mCamera.combined);
+//        batch.setProjectionMatrix(mCamera.combined);
         batch.begin();
+        batch.draw(lFb.getColorBufferTexture(),0,0);
 		batch.draw(img,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
 //        aFont.draw(batch,"WORLD!", -1.0f,10.0f);
 		batch.end();
 
-//		mBatch.begin(mCamera);
-//		mBatch.render(ballInstance);
-//		mBatch.end();
-//		ballInstance.transform.rotate(0.0f,1.0f,0.0f,0.5f);
+		mBatch.begin(mCamera);
+		mBatch.render(ballInstance);
+        mBatch.render(cylInst);
+		mBatch.end();
+		ballInstance.transform.rotate(0.0f,1.0f,0.0f,0.5f);
+        cylInst.transform.rotate(0.0f,1.0f,0.0f,0.5f);
 //		ballInstance.transform.translate(0,0,-0.05f);
 	}
 	
