@@ -43,7 +43,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
     @Override
 	public void create () {
-		mCamera = new PerspectiveCamera(67,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		mCamera = new PerspectiveCamera(67,Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
 		mCamera.update();
 		batch = new SpriteBatch();
 
@@ -55,11 +55,11 @@ public class MyGdxGame extends ApplicationAdapter {
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("font/Lato-Bold.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 30;
+        parameter.size = 16;
         parameter.color = Color.GREEN;
         parameter.magFilter = Texture.TextureFilter.Linear; // used for resizing quality
         parameter.minFilter = Texture.TextureFilter.Linear;
-        generator.scaleForPixelHeight(10);
+        generator.scaleForPixelHeight(8);
 
         aFont = generator.generateFont(parameter);
         aFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -67,16 +67,17 @@ public class MyGdxGame extends ApplicationAdapter {
         lFb = new FrameBuffer(Pixmap.Format.RGBA4444, TEXTURE_WIDTH, TEXTURE_HEIGHT,false);
 
         lFb.begin();
-        Gdx.gl.glViewport(0,0,TEXTURE_WIDTH,TEXTURE_HEIGHT);
+
+//        Gdx.gl.glViewport(0,0,-TEXTURE_WIDTH/2,-TEXTURE_HEIGHT/2);
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.4f, 1);
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 //        aFont.setColor(Color.BLUE);
         Matrix4 lm = new Matrix4();
-        lm.setToOrtho2D(0,0,128,128);
+        lm.setToOrtho2D(0,0,128,-128);
         batch.setProjectionMatrix(lm);
         batch.begin();
-        aFont.draw(batch,"Goal!",64,64);
+        aFont.draw(batch,"Goal!",64,-64);
         batch.end();
         lFb.end();
 //        aFont.draw(batch, options.get(i), aBound.getCenterX(), aBound.getCenterY() + textHeight / 2);
@@ -86,30 +87,31 @@ public class MyGdxGame extends ApplicationAdapter {
 
         Material lMaterial = new Material(TextureAttribute.createDiffuse(lFb.getColorBufferTexture()));
 
-		ballModel = mb.createSphere(1.0f,1.0f,1.0f,8,8,lMaterial, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
+		ballModel = mb.createSphere(1.0f,1.0f,1.0f,16,16,lMaterial, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
 
         ballInstance = new ModelInstance(ballModel);
 
         ballInstance.transform.translate(0,0,-1.5f);
 	}
 
+
 	@Override
 	public void render () {
-//		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.setProjectionMatrix(mCamera.combined);
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        batch.setProjectionMatrix(mCamera.combined);
         batch.begin();
-		batch.draw(img, 0, 0);
-        batch.setColor(Color.BLUE);
-        aFont.draw(batch,"WORLD!", -1.0f,10.0f);
+		batch.draw(img,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
+//        aFont.draw(batch,"WORLD!", -1.0f,10.0f);
 		batch.end();
 
-		mBatch.begin(mCamera);
-		mBatch.render(ballInstance);
-		mBatch.end();
-		ballInstance.transform.rotate(0.0f,1.0f,0.0f,0.5f);
+//		mBatch.begin(mCamera);
+//		mBatch.render(ballInstance);
+//		mBatch.end();
+//		ballInstance.transform.rotate(0.0f,1.0f,0.0f,0.5f);
 //		ballInstance.transform.translate(0,0,-0.05f);
 	}
 	
